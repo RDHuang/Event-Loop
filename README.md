@@ -57,3 +57,98 @@ Event Loop包含两大类： 一类是Browsing Context（浏览器上下文）�
     Y --->  执行所有微任务 --->  浏览器渲染
     N --->  浏览器渲染
     ```
+
+> 实战面试题
+
+下面代码执行结果
+```js
+console.log('script start');
+
+setTimeout(function () {
+  console.log('setTimeout');
+}, 0);
+
+Promise.resolve()
+  .then(function () {
+    console.log('promise1');
+  })
+  .then(function () {
+    console.log('promise2');
+  });
+
+console.log('script end');
+```
+
+结果为：
+```log
+script start
+script end
+promise1
+promise2
+setTimeout
+```
+
+> 难度升级
+
+```html
+<div class="outer">
+  <div class="inner"></div>
+</div>
+```
+
+```js
+// Let's get hold of those elements
+var outer = document.querySelector('.outer');
+var inner = document.querySelector('.inner');
+
+// Let's listen for attribute changes on the
+// outer element
+new MutationObserver(function () {
+  console.log('mutate');
+}).observe(outer, {
+  attributes: true,
+});
+
+// Here's a click listener…
+function onClick() {
+  console.log('click');
+
+  setTimeout(function () {
+    console.log('timeout');
+  }, 0);
+
+  Promise.resolve().then(function () {
+    console.log('promise');
+  });
+
+  outer.setAttribute('data-random', Math.random());
+}
+
+// …which we'll attach to both elements
+inner.addEventListener('click', onClick);
+outer.addEventListener('click', onClick);
+```
+
+当点击内部的class为inner的div时，会打印什么？
+```js
+click
+pormise
+mutate
+click
+promise
+mutate
+timeout
+timeout
+```
+
+当点击外部的class为outer的div时，会打印什么？
+```js
+click
+promise
+mutate
+timeout
+```
+
+最后附上一个[网址链接](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/)，国外一个关于宏任务微任务的详解，会有动画可以很好的帮助理解执行时机
+
+
